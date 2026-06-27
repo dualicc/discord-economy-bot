@@ -1,48 +1,19 @@
 require("dotenv").config();
 
-const {
-    Client,
-    GatewayIntentBits,
-    Collection
-} = require("discord.js");
+const { Client, GatewayIntentBits, Collection } = require("discord.js");
 
-const fs = require("fs");
-const path = require("path");
+const loadCommands = require("./handlers/commandHandler");
+const readyEvent = require("./events/ready");
 
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds
-    ]
+    intents: [GatewayIntentBits.Guilds]
 });
 
 client.commands = new Collection();
 
-const commandFolders = path.join(__dirname, "commands");
+loadCommands(client);
 
-if (fs.existsSync(commandFolders)) {
-    const folders = fs.readdirSync(commandFolders);
-
-    for (const folder of folders) {
-        const folderPath = path.join(commandFolders, folder);
-
-        const commandFiles = fs
-            .readdirSync(folderPath)
-            .filter(file => file.endsWith(".js"));
-
-        for (const file of commandFiles) {
-            const filePath = path.join(folderPath, file);
-            const command = require(filePath);
-
-            if (command.data && command.execute) {
-                client.commands.set(command.data.name, command);
-            }
-        }
-    }
-}
-
-client.once("ready", () => {
-    console.log(`${client.user.tag} is online.`);
-});
+client.once("ready", () => readyEvent(client));
 
 client.on("interactionCreate", async interaction => {
 
@@ -53,26 +24,29 @@ client.on("interactionCreate", async interaction => {
     if (!command) return;
 
     try {
-        await command.execute(interaction);
-    } catch (error) {
 
-        console.error(error);
+        await command.execute(interaction);
+
+    } catch (err) {
+
+        console.error(err);
 
         if (interaction.replied || interaction.deferred) {
 
-            await interaction.followUp({
-                content: "There was an error while executing this command.",
+            interaction.followUp({
+                content: "Something went wrong.",
                 ephemeral: true
             });
 
         } else {
 
-            await interaction.reply({
-                content: "There was an error while executing this command.",
+            interaction.reply({
+                content: "Something went wrong.",
                 ephemeral: true
             });
 
         }
+
     }
 
 });
