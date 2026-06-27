@@ -1,2 +1,22 @@
-# discord-economy-bot
-A lightweight Discord.js economy bot featuring balances, work, daily rewards, robbing, shops, inventories, and leaderboards.
+# Discord Economy Bot
+
+A Discord.js economy bot inspired by UnbelievaBoat.
+
+## Features
+
+-  Balance
+-  Daily rewards
+-  Work
+-  Beg
+-  Rob players
+-  Pay users
+-  Shop
+-  Inventory
+-  Leaderboard
+-  Admin economy commands
+
+## Stack
+
+- Discord.js v14
+- SQLite
+- Slash Commands
