@@ -1,1 +1,13 @@
-
+{
+    "currency": "Coins",
+    "dailyReward": 500,
+    "workMin": 150,
+    "workMax": 600,
+    "begMin": 25,
+    "begMax": 150,
+    "robSuccessChance": 0.45,
+    "robCooldown": 3600,
+    "dailyCooldown": 86400,
+    "workCooldown": 1800,
+    "begCooldown": 900
+}
