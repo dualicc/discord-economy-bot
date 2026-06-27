@@ -19,48 +19,22 @@ CREATE TABLE IF NOT EXISTS cooldowns (
 `);
 
 function createUser(userId) {
+    const user = db.prepare("SELECT * FROM users WHERE userId = ?").get(userId);
 
-    const exists = db.prepare(
-        "SELECT userId FROM users WHERE userId = ?"
-    ).get(userId);
-
-    if (!exists) {
-
+    if (!user) {
         db.prepare(`
-            INSERT INTO users (userId)
-            VALUES (?)
+            INSERT INTO users (userId, balance, bank, inventory)
+            VALUES (?, 0, 0, '[]')
         `).run(userId);
-
     }
-
 }
 
 function getUser(userId) {
-
     createUser(userId);
-
-    return db.prepare(`
-        SELECT *
-        FROM users
-        WHERE userId = ?
-    `).get(userId);
-
+    return db.prepare("SELECT * FROM users WHERE userId = ?").get(userId);
 }
 
-function setBalance(userId, amount) {
-
-    createUser(userId);
-
-    db.prepare(`
-        UPDATE users
-        SET balance = ?
-        WHERE userId = ?
-    `).run(amount, userId);
-
-}
-
-function addBalance(userId, amount) {
-
+function addMoney(userId, amount) {
     createUser(userId);
 
     db.prepare(`
@@ -68,12 +42,32 @@ function addBalance(userId, amount) {
         SET balance = balance + ?
         WHERE userId = ?
     `).run(amount, userId);
+}
 
+function removeMoney(userId, amount) {
+    createUser(userId);
+
+    db.prepare(`
+        UPDATE users
+        SET balance = MAX(balance - ?, 0)
+        WHERE userId = ?
+    `).run(amount, userId);
+}
+
+function setMoney(userId, amount) {
+    createUser(userId);
+
+    db.prepare(`
+        UPDATE users
+        SET balance = ?
+        WHERE userId = ?
+    `).run(amount, userId);
 }
 
 module.exports = {
-    db,
     getUser,
-    addBalance,
-    setBalance
+    addMoney,
+    removeMoney,
+    setMoney,
+    db
 };
